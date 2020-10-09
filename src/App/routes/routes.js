@@ -19,7 +19,7 @@ export default [
     // { path: "/", name: "Home", component: LandingPage },
     { path: "/books", name: "Books", component: Books },
     { path: "/login", name: "LogIn", component: LogIn },
-    { path: "/signup", name: "SignUp", component: SignUp },
+    { path: "/newuser", name: "SignUp", component: SignUp },
     { path: "/admin", name: "Admin", component: Admin },
     { path: "/profile", name: "Profile", component: Profile },
     { path: "/addBook", name: "AddBook", component: AddBook },

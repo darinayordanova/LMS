@@ -240,7 +240,7 @@ function Admin() {
             </Link>
           </Grid>
           <Grid item xs={3}>
-            <Link style={{ textDecoration: 'none' }} to={'/book-search'}>
+            <Link style={{ textDecoration: 'none' }} to={'/newuser'}>
               <Paper className={classes.addBook}>
                 <ImportContactsIcon />
                 <Typography variant="h6" component="div">

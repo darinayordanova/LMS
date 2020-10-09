@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import { auth, signInWithGoogle, generateUserDocument } from "../../Firebase/firebase";
+import { auth, signInWithGoogle, generateUserDocument, secondaryApp } from "../../Firebase/firebase";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -37,34 +37,28 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LogIn() {
     const classes = useStyles();
-    const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
-    const [passwordOne, setPasswordOne] = useState('')
-    const [passwordTwo, setPasswordTwo] = useState('')
     const [error, setError] = useState(null)
     const history = useHistory();
 
-    const isInvalid =
-        passwordOne !== passwordTwo ||
-        passwordOne === '' ||
-        passwordOne.length < 6 ||
-        email === '' ||
-        username === '';
+    const isInvalid = email === '';
     const createUserWithEmailAndPasswordHandler = async (event, email, password) => {
         event.preventDefault();
         try {
-            const { user } = await auth.createUserWithEmailAndPassword(email, password);
-            generateUserDocument(user, { username });
+            const { user } = await secondaryApp.createUserWithEmailAndPassword(email, password)
+            user.sendEmailVerification().then(function (r) {
+                // Email sent.
+                console.log(user)
+                secondaryApp.signOut();
+            })
+
+            // generateUserDocument(user, { username });
         }
         catch (error) {
             setError('Error Signing up with email and password');
         }
-        history.push('/');
-
-        setEmail("");
-        setPasswordOne("");
-        setPasswordTwo("");
-        setUsername("");
+        // history.push('/');
+        setEmail('')
     };
 
     return (
@@ -76,18 +70,7 @@ export default function LogIn() {
                     Нов Потребител
         </Typography>
                 <form className={classes.form} noValidate >
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        value={username}
-                        label="Име"
-                        name="username"
-                        autoComplete="username"
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
+
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -101,30 +84,7 @@ export default function LogIn() {
                         onChange={(e) => setEmail(e.target.value)}
 
                     />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Парола"
-                        type="password"
-                        id="password"
-                        value={passwordOne}
-                        onChange={(e) => setPasswordOne(e.target.value)}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Повтори парола"
-                        type="password"
-                        id="password2"
-                        value={passwordTwo}
-                        onChange={(e) => setPasswordTwo(e.target.value)}
-                    />
+
 
                     <Button
                         fullWidth
@@ -133,11 +93,11 @@ export default function LogIn() {
                         disabled={isInvalid}
                         className={classes.submit}
                         onClick={event => {
-                            createUserWithEmailAndPasswordHandler(event, email, passwordOne);
+                            createUserWithEmailAndPasswordHandler(event, email, '000000');
                         }}
 
                     >
-                        Регистрирай се
+                        Регистрирай
           </Button>
                     {/* <Typography component="p" variant="body1" align="center"  >
                         or
@@ -159,15 +119,7 @@ export default function LogIn() {
                         Sign In with Google
                         </Button> */}
                     {error && <p>{error.message}</p>}
-                    <Grid container>
-                        <Grid item xs>
-                        </Grid>
-                        <Grid item>
-                            <Link to={'/login'} variant="body2">
-                                {"Имаш акаунт? Влез от тук!"}
-                            </Link>
-                        </Grid>
-                    </Grid>
+                    
                 </form>
             </div>
         </Container>
