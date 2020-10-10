@@ -69,9 +69,12 @@ function Profile() {
     const [futureBooks, setFutureBooks] = useState([])
     const [pastBooks, setPastBooks] = useState([])
     const [value, setValue] = useState(0);
+    const history = useHistory();
     moment.locale('bg')
+    
     useEffect(() => {
         var newArr = []
+        console.log(user)
         setCurrentBooks([])
         setFutureBooks([])
         setPastBooks([])
@@ -131,9 +134,11 @@ function Profile() {
                 user !== undefined ?
                     (
                         <div className="content">
-                            <Typography variant="h1" component="h1">Hello {user.username}!</Typography>
+                            <Typography variant="h1" component="h1">Здравей {user.username}!</Typography>
                             <h3>E-mail: {user.email}</h3>
-                            <Button color="primary" variant="contained" className="w-full py-3 bg-red-600 mt-4 text-white" onClick={() => { auth.signOut() }}>Sign out</Button>
+                            <Button color="secondary" variant="contained" style={{ display: 'block', marginBottom: '20px' }} onClick={() => { history.push('/changePassword') }}>Смени парола</Button>
+
+                            <Button color="primary" variant="contained" className="w-full py-3 bg-red-600 mt-4 text-white" onClick={() => { auth.signOut() }}>Изход</Button>
                             <AppBar position="static" style={{ marginTop: '50px' }}>
                                 <Tabs
                                     value={value}
@@ -178,7 +183,10 @@ function Profile() {
                                                             <TableCell>{moment(row.endDate?.seconds * 1000).format("dddd, DD.MM.YYYY")}</TableCell>
                                                         </TableRow>
                                                     ))
-                                                    : null
+                                                    : 
+                                                    <TableRow>
+                                                        <TableCell colSpan={4} style={{textAlign:'center'}}>Нямате настоящи книги</TableCell>
+                                                    </TableRow>
                                                 }
                                             </TableBody>
                                         </Table>
@@ -217,7 +225,10 @@ function Profile() {
                                                             <TableCell>{moment(row.endDate?.seconds * 1000).format("dddd, DD.MM.YYYY")}</TableCell>
                                                         </TableRow>
                                                     ))
-                                                    : null
+                                                    :
+                                                    <TableRow>
+                                                        <TableCell colSpan={4} style={{textAlign:'center'}}>Нямате намерени предстоящи книги</TableCell>
+                                                    </TableRow>
                                                 }
                                             </TableBody>
                                         </Table>
@@ -256,7 +267,10 @@ function Profile() {
                                                             <TableCell>{moment(row.endDate?.seconds * 1000).format("dddd, DD.MM.YYYY")}</TableCell>
                                                         </TableRow>
                                                     ))
-                                                    : null
+                                                    : 
+                                                    <TableRow>
+                                                        <TableCell colSpan={4} style={{textAlign:'center'}}>Нямате намерени прочетени книги</TableCell>
+                                                    </TableRow>
                                                 }
                                             </TableBody>
                                         </Table>

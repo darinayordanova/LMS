@@ -26,6 +26,39 @@ export const signInWithGoogle = () => {
   auth.signInWithPopup(provider);
 };
 
+export const forgotPassword = (email) => {
+  auth.sendPasswordResetEmail(email)
+    .then(function (user) {
+      alert('Please check your email...')
+    }).catch(function (e) {
+      console.log(e)
+    })
+}
+
+export const changePassword = (currentPassword, newPassword) => {
+  console.log(currentPassword)
+  console.log(newPassword)
+
+  reauthenticate(currentPassword).then(() => {
+    var user = firebase.auth().currentUser;
+    user.updatePassword(newPassword).then(() => {
+      console.log("Password updated!");
+    }).catch((error) => { console.log(error); });
+  }).catch((error) => { console.log(error); });
+
+
+}
+
+const reauthenticate = currentPassword => {
+  var user = firebase.auth().currentUser;
+  var cred = firebase.auth.EmailAuthProvider.credential(
+    user.email, currentPassword);
+  return user.reauthenticateWithCredential(cred);
+}
+
+
+//forgorten pass
+
 export const generateUserDocument = async (user, additionalData) => {
   if (!user) return;
   const userRef = firestore.doc(`users/${user.uid}`);
@@ -67,6 +100,7 @@ export const onAuthUserListener = (next, fallback) =>
       fallback();
     }
   });
+
 const getUserDocument = async uid => {
   if (!uid) return null;
   try {
@@ -79,6 +113,4 @@ const getUserDocument = async uid => {
   } catch (error) {
     console.error("Error fetching user", error);
   }
-
-
 };

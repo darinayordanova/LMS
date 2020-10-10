@@ -316,7 +316,11 @@ function BookItem() {
                                 }
                                 <p className={classes.language}>{itemBook?.language}</p>
                             </div>
-                            {itemBook?.genre?.map((item) => <Chip style={{ maxWidth: '100%', margin: '5px 0' }} label={`#${item}`} component="a" href="#chip" clickable />)}
+                            {itemBook?.genre?.map((item) =>
+                                <Link style={{ textDecoration: 'none', cursor: 'pointer' }} to={`/category/${item}`} >
+                                    <Chip style={{ maxWidth: '100%', margin: '5px 0' }} label={`#${item}`}  clickable />
+                                </Link>
+                            )}
 
                         </Grid>
                         <Grid item md={8} xs={12}>

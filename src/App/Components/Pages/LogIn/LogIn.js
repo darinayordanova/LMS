@@ -118,6 +118,9 @@ function LogIn({ history }) {
           >
             Влез
           </Button>
+          <Link style={{ textDecoration: 'none', cursor: 'pointer' }} to={'/forgottenPassword'} >
+            Забравена парола?
+          </Link>
           {/* <Grid container>
             <Grid item xs>
               <Link to={'/forgottenPassword'} variant="body2">

@@ -19,7 +19,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -70,9 +70,11 @@ function Admin() {
   const [booksToBeTaken, setBooksToBeTaken] = useState({})
   const [booksToBeReturned, setBooksToBeReturned] = useState({})
   const [еxpired, setЕxpired] = useState({})
+  const [еxpiredToBeTaken, setЕxpiredToBeTaken] = useState({})
   const [searchTake, setSearchTake] = useState('')
   const [searchReturn, setSearchReturn] = useState('')
   const [searchЕxpired, setSearchЕxpired] = useState('')
+  const [searchЕxpiredToBeTaken, setSearchЕxpiredToBeTaken] = useState('')
   const [localUser, setLocalUser] = useState({})
   const [value, setValue] = React.useState(0);
 
@@ -109,9 +111,18 @@ function Admin() {
         Date.parse(element.endDate.toDate().toDateString()) < Date.parse(today.toDateString())
       );
 
+    let filteredArray4 = books
+      .filter(element =>
+        element.status === "toBeTaken"
+      )
+      .filter(element =>
+        Date.parse(element.startDate.toDate().toDateString()) < Date.parse(today.toDateString())
+      );
+
     setBooksToBeTaken(filteredArray)
     setBooksToBeReturned(filteredArray1)
     setЕxpired(filteredArray3)
+    setЕxpiredToBeTaken(filteredArray4)
   }, [books])
 
   useEffect(() => {
@@ -166,6 +177,23 @@ function Admin() {
         card.user.username.toLowerCase().includes(searchЕxpired.toLowerCase()) || card.book.title.toLowerCase().includes(searchЕxpired.toLowerCase())))
     }
   }, [searchЕxpired])
+
+  useEffect(() => {
+    let filteredArray = books
+      .filter(element =>
+        element.status === "toBeTaken"
+      )
+      .filter(element =>
+        element.startDate.toDate() < today
+      );
+    if (searchЕxpired === '') {
+      setЕxpiredToBeTaken(filteredArray)
+    }
+    else {
+      setЕxpiredToBeTaken(filteredArray.filter(card =>
+        card.user.username.toLowerCase().includes(searchЕxpiredToBeTaken.toLowerCase()) || card.book.title.toLowerCase().includes(searchЕxpiredToBeTaken.toLowerCase())))
+    }
+  }, [searchЕxpiredToBeTaken])
 
   const ChangeStatusToTaken = async (operation) => {
     const data = await firestore.collection('users').doc(operation.user.uid).get()
@@ -240,7 +268,7 @@ function Admin() {
             </Link>
           </Grid>
           <Grid item xs={3}>
-            <Link style={{ textDecoration: 'none' }} to={'/book-search'}>
+            <Link style={{ textDecoration: 'none' }} to={'/books'}>
               <Paper className={classes.addBook}>
                 <ImportContactsIcon />
                 <Typography variant="h6" component="div">
@@ -253,10 +281,10 @@ function Admin() {
           <Grid item xs={3}>
             <Link style={{ textDecoration: 'none' }} to={'/users'}>
               <Paper className={classes.addBook}>
-                <SettingsIcon />
+                <PersonAddIcon />
 
                 <Typography variant="h6" component="div">
-                  Начална страница
+                  Нов потребител
                 </Typography>
               </Paper>
 
@@ -273,7 +301,8 @@ function Admin() {
               >
                 <Tab label="За взимане" />
                 <Tab label="За връщане" />
-                <Tab label="Просрочени" />
+                <Tab label="Просрочени (Връщане)" />
+                <Tab label="Просрочени (Взимане)" />
               </Tabs>
             </AppBar>
             <TabPanel value={value} index={0}>
@@ -473,8 +502,75 @@ function Admin() {
                   </Table>
                 </TableContainer>
               </Paper>
-            </TabPanel>
+            </TabPanel> 
 
+
+            <TabPanel value={value} index={3}>
+              <Paper className={classes.paper}>
+                <Grid container spacing={2} >
+                  <Grid item xs={6}>
+                    <Typography variant="h4" component="div">
+                      Просрочени(Взимане)
+                  </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      className={classes.searchBar}
+                      id="standard-search"
+                      label="Книга / Потребител"
+                      fullWidth
+                      value={searchЕxpiredToBeTaken}
+                      type="search"
+                      onChange={(e) => setSearchЕxpiredToBeTaken(e.target.value)} />
+                  </Grid>
+                </Grid>
+                <TableContainer >
+                  <Table className={classes.table} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Book</TableCell>
+                        <TableCell>Location</TableCell>
+
+                        <TableCell>User</TableCell>
+                        <TableCell>From Date</TableCell>
+                        <TableCell>To date</TableCell>
+                        <TableCell>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {еxpiredToBeTaken.length ?
+                        еxpiredToBeTaken.map((row) => (
+                          <TableRow key={row.id}>
+                            <TableCell component="th" scope="row">
+                              <Link style={{ textDecoration: 'none' }} to={{ pathname: `/books/${row.bookId}` }}>
+                                {row.book.title}
+                              </Link>
+                            </TableCell>
+                            <TableCell component="th" scope="row">
+                              {row.book.location}
+                            </TableCell>
+                            <TableCell>
+                              <Link style={{ textDecoration: 'none' }} to={{ pathname: `/users/${row.user.uid}` }}>
+                                {row.user.username}
+                              </Link>
+                            </TableCell>
+                            <TableCell>
+                              {row.startDate.toDate().toDateString()}
+                            </TableCell>
+                            <TableCell>
+                              {row.endDate.toDate().toDateString()}
+                            </TableCell>
+                            <TableCell><Button color="primary" variant="contained" className={classes.clBtn} onClick={() => ChangeStatusToTaken(row)}>Взета</Button></TableCell>
+
+                          </TableRow>
+                        ))
+                        : null
+                      }
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </TabPanel>
 
 
           </Grid>

@@ -86,9 +86,6 @@ function UserItem(book) {
 
     useEffect(() => {
         var newArr = []
-        // setCurrentBooks([])
-        // setFutureBooks([])
-        // setPastBooks([])
         if (user.booksCurrentlyInUser) {
             user.booksCurrentlyInUser.map(el => {
                 firestore.collection('books').doc(el.book).get().then(data => {
